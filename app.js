@@ -44,8 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (profile.avatar) {
       const avatarEl = document.getElementById('avatarImg');
-      const bust = (profile.avatar.includes('?') ? '&' : '?') + 't=' + Date.now();
-      avatarEl.src = profile.avatar.startsWith('http') ? profile.avatar : (profile.avatar + bust);
+      if (profile.avatar.startsWith('data:')) {
+        avatarEl.src = profile.avatar;
+      } else {
+        const bust = (profile.avatar.includes('?') ? '&' : '?') + 't=' + Date.now();
+        avatarEl.onerror = () => {
+          if (!avatarEl.dataset.retried) {
+            avatarEl.dataset.retried = '1';
+            avatarEl.src = 'assets/images/avatar.png';
+          }
+        };
+        avatarEl.src = profile.avatar.startsWith('http') ? profile.avatar : (profile.avatar + bust);
+      }
     }
 
     // Discord Badges
